@@ -1,0 +1,209 @@
+// 	AD5172_I2C - written by Jim Sedgwick
+//	Routines for I2C communication with the AD5172 Pot IC
+
+// Includes routines for reading and writing
+// AD5172 is at fixed hardware address of 0x5E
+
+// Global variable errorFlag is set to "1" if an acknowledge error occurs
+
+// Revision history
+//	2007-12-14 JBS: first pass routines were created.
+
+#include 	<pic18.h>
+#include 	"DELAY16.H"
+#include 	"Humidity Cal Master.h"
+#include 	"AD5172_I2C.h"
+#include	"stdio.h"
+
+extern unsigned char errorFlag;
+extern unsigned char EEPROMbuffer[];
+
+//	This routine sets up I2C functions for master mode
+
+void initialize_AD5172 (void)
+{
+	// 0010 1000B = 0x28
+	SSPCON1 = 0x28; 	// SSPEN = 1, SDA and SCL for I2C
+					// I2C Master mode = Fosc/ (4 * (SSPADD + 1))
+	SSPADD = 9;	// FBUS = OSC/4 /(N+1)  OSC = 4, OCS =0.4; 10 IS JUST RIGHT
+	SSPSTAT = 0;	// Clear MSSP status register
+
+	// Make sure I2C is STOPPED:
+	i2c_Stop();
+}
+
+
+//  Send stop condition
+// 	  - data low-high while clock high
+
+void
+AD5172_Stop(void)
+{
+	PEN = 1;			// Send STOP condition
+	while (SSPIF == 0); // WAIT TILL SSPIF SET IN PIR REGISTER
+	SSPIF = 0;			// CLEAR FLAG
+}
+
+//	Send start condition
+
+void
+AD5172_Start(void)
+{
+	SEN = 1;			// Send START condition
+	while (SSPIF == 0); // WAIT TILL SSPIF SET IN PIR REGISTER
+	SSPIF = 0;			// CLEAR FLAG
+}
+
+
+//	Send restart condition
+
+void
+AD5172_Restart(void)
+{
+	RSEN = 1;			// Send REPEATED START condition
+	while (SSPIF == 0); // WAIT TILL SSPIF SET IN PIR REGISTER
+	SSPIF = 0;			// CLEAR FLAG
+}
+
+//	Send a byte to the slave
+// 	  - returns true on error
+
+unsigned char
+AD5172_SendByte(unsigned char byte)
+{
+
+	SSPBUF = byte;		// Send byte
+	while (SSPIF == 0); // WAIT TILL SSPIF SET IN PIR REGISTER
+	SSPIF = 0;			// CLEAR FLAG	
+
+	return FALSE;
+}
+
+//	send control byte and data direction to the slave
+//  	- 7-bit control byte (lsb ignored)
+// 	  	- direction (0 = write )
+
+unsigned char
+AD5172_SendControlByte(unsigned char controlByte, unsigned char direction)
+{
+unsigned char outByte;
+
+		outByte = controlByte | direction;
+        return i2c_SendByte (outByte);
+}
+
+//	Check for an acknowledge
+// 	  - returns ack or ~ack
+
+signed char
+AD5172_ReadAcknowledge(void)
+{
+unsigned char ack;
+
+	ack = ACKDT;
+	return ack;
+}
+
+//	Read a byte from the slave
+// 	  - returns the byte
+
+int
+AD5172_ReadByte(void)
+{
+unsigned char byte;
+	
+	RCEN = 1;	// Enable receive mode for I2C
+	while (SSPIF == 0); // WAIT TILL SSPIF SET IN PIR REGISTER
+	SSPIF = 0;			// CLEAR FLAG	
+	byte = SSPBUF;
+	return (int)byte;
+}
+
+//	Send an (~)acknowledge to the slave
+//		- status of I2C_LAST implies this is the last byte to be sent
+//    	- if there are more bytes, then ACK must be brought low
+//		- if there are no more bytes, then ACK is left high
+//
+// Returns nothing
+
+void
+AD5172_SendAcknowledge(unsigned char status)
+{
+        if ( status & 0x01) {
+ 			ACKDT = 0; // drive line low -> more to come
+        }
+        else { 
+ 			ACKDT = 1; // line left high -> last expected byte has been received
+	}	
+	ACKEN = 1;	// Initiate acknowledge sequence
+	while (SSPIF == 0); // WAIT TILL SSPIF SET IN PIR REGISTER
+	SSPIF = 0;			// CLEAR FLAG
+}
+
+
+// Writes one byte to a single EEPROM address
+
+void AD5172_WriteByte(unsigned char device, unsigned int address, unsigned char dataByte) {
+unsigned char addressHigh, addressLow;
+
+	errorFlag = 0x00;	// Clear error flag
+
+	addressHigh = (unsigned char) ((address & 0xFF00) >> 8);
+	addressLow = (unsigned char) (address & 0x00FF);
+
+	// Send START condition and WRITE command:
+	i2c_Start();
+	i2c_SendControlByte(device, I2C_WRITE);
+	errorFlag = errorFlag | i2c_ReadAcknowledge();
+
+	// Send two byte EEPROM address:
+	i2c_SendByte(addressHigh);
+	errorFlag = errorFlag | i2c_ReadAcknowledge();
+	i2c_SendByte(addressLow);
+	errorFlag = errorFlag | i2c_ReadAcknowledge();
+
+	// Now send DATA byte, then read acknowledge:
+	i2c_SendByte(dataByte);
+	errorFlag = errorFlag | i2c_ReadAcknowledge();
+
+	// Send STOP condition
+	i2c_Stop();
+}
+
+// Reads one byte from a single EEPROM address
+
+int AD5172ReadByte(unsigned char device, unsigned int address) {
+unsigned char addressHigh, addressLow;
+int dataByte;
+
+	errorFlag = 0x00;	// Clear error flag
+
+	addressHigh = (unsigned char) ((address & 0xFF00) >> 8);
+	addressLow = (unsigned char) (address & 0x00FF);
+
+	// Send START condition and WRITE command:
+	i2c_Start();
+	i2c_SendControlByte(device, I2C_WRITE);
+	errorFlag = errorFlag | i2c_ReadAcknowledge();
+
+	// Send two byte EEPROM address:
+	i2c_SendByte(addressHigh);
+	errorFlag = errorFlag | i2c_ReadAcknowledge();
+	i2c_SendByte(addressLow);
+	errorFlag = errorFlag | i2c_ReadAcknowledge();
+
+	// Now send READ command:
+	i2c_Restart();	
+	i2c_SendControlByte(device, I2C_READ);
+	errorFlag = errorFlag | i2c_ReadAcknowledge();
+
+	// Now read DATA byte, followed by STOP condition and no acknowledge:
+	dataByte = i2c_ReadByte();
+	i2c_Stop();
+	return(dataByte);
+}
+
+
+
+
+

@@ -1,0 +1,176 @@
+
+
+HI-TECH Software PICC-18 Macro Assembler V9.50PL2
+                                                       Mon Sep 29 14:45:38 2008
+
+
+     1                           	processor	18F4550
+     2                           	opt	pw 80
+     3                           	psect	text,global,reloc=2,class=CODE,delta=1
+     4                           	psect	intsave_regs,global,class=BIGRAM,space=1,
+      +                          delta=1
+     5  000000                     
+     6  000000                     
+     7  000000                     
+     8  000000                     
+     9  000000                     
+    10  000000                     
+    11  000000                     
+    12  000000                     
+    13  000000                     
+    14  000000                     
+    15  000000                     
+    16  000000                     
+    17  000000                     
+    18  000000                     
+    19  000000                     
+    20  000000                     
+    21  000000                     
+    22  000000                     
+    23  000000                     
+    24  000000                     
+    25  000000                     
+    26  000000                     
+    27  000000                     
+    28  000000                     
+    29  000000                     
+    30  000000                     
+    31  000000                     
+    32  000000                     
+    33  000000                     
+    34  000000                     
+    35  000000                     
+    36  000000                     
+    37  000000                     
+    38  000000                     
+    39  000000                     
+    40  000000                     
+    41  000000                     
+    42  000000                     
+    43  000000                     
+    44  000000                     
+    45  000000                     
+    46  000000                     
+    47  000000                     
+    48  000000                     
+    49  000000                     
+    50  000000                     
+    51  000000                     
+    52  000000                     
+    53  000000                     
+    54  000000                     
+    55  000000                     
+    56  000000                     
+    57  000000                     
+    58  000000                     
+    59  000000                     
+    60  000000                     
+    61  000000                     
+    62  000000                     
+    63  000000                     
+    64  000000                     
+    65  000000                     
+    66  000000                     
+    67  000000                     
+    68  000000                     
+    69  000000                     
+    70  000000                     
+    71  000000                     
+    72  000000                     
+    73  000000                     
+    74  000000                     
+    75  000000                     
+    76  000000                     
+    77  000000                     
+    78  000000                     
+    79  000000                     
+    80  000000                     
+    81  000000                     
+    82  000000                     
+    83  000000                     
+    84  000000                     
+    85  000000                     
+    86  000000                     
+    87  000000                     
+    88  000000                     
+    89  000000                     
+    90  000000                     
+    91  000000                     
+    92  000000                     
+    93  000000                     
+    94  000000                     _DelayMs$i	set	?_DelayMs
+    95                           
+    96                           	psect	text
+    97  006B7C  00B4               	dw	?_DelayMs
+    98  006B7E                     _DelayMs:
+    99  000000                     
+   100                           ;DELAY16.C: 17: void DelayMs(unsigned int i)
+   101  006B7E  6AF3               	clrf	prodl,c
+   102  006B80  6AF4               	clrf	prodh,c
+   103  006B82                     l5:
+   104  006B82  0100               	movlb	__Lparam shr (0+8)
+   105  006B84  51B5               	movf	(?_DelayMs+1)^(__Lparam& (0+65280)),w
+   106  006B86  5CF4               	subwf	prodh,w,c
+   107  006B88  E102               	bnz	u55
+   108  006B8A  51B4               	movf	?_DelayMs^(__Lparam& (0+65280)),w
+   109  006B8C  5CF3               	subwf	prodl,w,c
+   110  006B8E                     u55:
+   111  006B8E  B0D8               	btfsc	status,0,c
+   112  006B90  0012               	return	
+   113                           ;DELAY16.C: 23: {
+   114  006B92  68D9               	setf	fsr2l,c
+   115                           ;DELAY16.C: 25: while(k--);
+   116  006B94                     l6:
+   117  006B94  06D9               	decf	fsr2l,f,c
+   118  006B96  28D9               	incf	fsr2l,w,c
+   119  006B98  E1FD               	bnz	l6
+   120                           ;DELAY16.C: 26: k=255;
+   121  006B9A  68D9               	setf	fsr2l,c
+   122                           ;DELAY16.C: 27: while(k--);
+   123  006B9C                     l9:
+   124  006B9C  06D9               	decf	fsr2l,f,c
+   125  006B9E  28D9               	incf	fsr2l,w,c
+   126  006BA0  E1FD               	bnz	l9
+   127                           ;DELAY16.C: 28: k=255;
+   128  006BA2  68D9               	setf	fsr2l,c
+   129                           ;DELAY16.C: 29: while(k--);
+   130  006BA4                     l12:
+   131  006BA4  06D9               	decf	fsr2l,f,c
+   132  006BA6  28D9               	incf	fsr2l,w,c
+   133  006BA8  E1FD               	bnz	l12
+   134                           ;DELAY16.C: 30: k=255;
+   135  006BAA  68D9               	setf	fsr2l,c
+   136                           ;DELAY16.C: 31: while(k--);
+   137  006BAC                     l15:
+   138  006BAC  06D9               	decf	fsr2l,f,c
+   139  006BAE  28D9               	incf	fsr2l,w,c
+   140  006BB0  E1FD               	bnz	l15
+   141  006BB2  4AF3               	infsnz	prodl,f,c
+   142  006BB4  2AF4               	incf	prodh,f,c
+   143  006BB6  D7E5               	goto	l5
+   144                           ;DELAY16.C: 32: }
+   145  006BB8                     _DelayUs:
+   146  000000                     
+   147                           ; _i loaded to fsr2l
+   148  006BB8  6ED9               	movwf	fsr2l,c
+   149                           ;DELAY16.C: 38: void DelayUs(unsigned char i)
+   150  006BBA                     l19:
+   151  006BBA  06D9               	decf	fsr2l,f,c
+   152  006BBC  28D9               	incf	fsr2l,w,c
+   153  006BBE  B4D8               	btfsc	status,2,c
+   154  006BC0  0012               	return	
+   155  006BC2  D7FB               	goto	l19
+   156                           prodh	equ	0xFF4
+   157                           prodl	equ	0xFF3
+   158                           fsr2l	equ	0xFD9
+   159                           status	equ	0xFD8
+
+
+HI-TECH Software PICC-18 Macro Assembler V9.50PL2
+Symbol Table                                           Mon Sep 29 14:45:38 2008
+
+          l5 6B82            l6 6B94            l9 6B9C  
+         l12 6BA4           l15 6BAC           l19 6BBA  
+         u55 6B8E         fsr2l 000FD9         prodl 000FF3  
+    _DelayMs 6B7E      _DelayUs 6BB8        status 000FD8  
+   ?_DelayMs 00B4      __Lparam 0097      __ramtop 0400  

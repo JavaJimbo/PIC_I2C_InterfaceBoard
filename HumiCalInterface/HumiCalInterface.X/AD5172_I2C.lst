@@ -1,0 +1,671 @@
+
+
+HI-TECH Software PICC-18 Macro Assembler V9.50PL2
+                                                       Mon Sep 29 14:45:38 2008
+
+
+     1                           	processor	18F4550
+     2                           	opt	pw 80
+     3                           	psect	text,global,reloc=2,class=CODE,delta=1
+     4                           	psect	temp,global,ovrld,common,class=COMRAM,spa
+      +                          ce=1,delta=1
+     5                           	psect	intsave_regs,global,class=BIGRAM,space=1,
+      +                          delta=1
+     6  000000                     
+     7  000000                     
+     8  000000                     
+     9  000000                     
+    10  000000                     
+    11  000000                     
+    12  000000                     
+    13  000000                     
+    14  000000                     
+    15  000000                     
+    16  000000                     
+    17  000000                     
+    18  000000                     
+    19  000000                     
+    20  000000                     
+    21  000000                     
+    22  000000                     
+    23  000000                     
+    24  000000                     
+    25  000000                     
+    26  000000                     
+    27  000000                     
+    28  000000                     
+    29  000000                     
+    30  000000                     
+    31  000000                     
+    32  000000                     
+    33  000000                     
+    34  000000                     
+    35  000000                     
+    36  000000                     
+    37  000000                     
+    38  000000                     
+    39  000000                     
+    40  000000                     
+    41  000000                     
+    42  000000                     
+    43  000000                     
+    44  000000                     
+    45  000000                     
+    46  000000                     
+    47  000000                     
+    48  000000                     
+    49  000000                     
+    50  000000                     
+    51  000000                     
+    52  000000                     
+    53  000000                     
+    54  000000                     
+    55  000000                     
+    56  000000                     
+    57  000000                     
+    58  000000                     
+    59  000000                     
+    60  000000                     
+    61  000000                     
+    62  000000                     
+    63  000000                     
+    64  000000                     
+    65  000000                     
+    66  000000                     
+    67  000000                     
+    68  000000                     
+    69  000000                     
+    70  000000                     
+    71  000000                     
+    72  000000                     
+    73  000000                     
+    74  000000                     
+    75  000000                     
+    76  000000                     
+    77  000000                     
+    78  000000                     
+    79  000000                     
+    80  000000                     
+    81  000000                     
+    82  000000                     
+    83  000000                     
+    84  000000                     
+    85  000000                     
+    86  000000                     
+    87  000000                     
+    88  000000                     
+    89  000000                     
+    90  000000                     
+    91  000000                     
+    92  000000                     
+    93  000000                     
+    94  000000                     
+    95                           
+    96                           	psect	text
+    97  00016E                     _initialize_I2C:
+    98                           ;       param _numBytes assigned to ?_i2c_SlaveR
+      +                          ead+0
+    99  000000                     _i2c_SlaveRead$numBytes	set	?_i2c_SlaveRead
+   100                           ;       param _numDataBytes assigned to ?_i2c_Sl
+      +                          aveWrite+0
+   101  000000                     _i2c_SlaveWrite$numDataBytes	set	?_i2c_SlaveWrit
+      +                          e
+   102  000000                     
+   103                           ;AD5172_I2C.c: 34: void initialize_I2C(void)
+   104  00016E  0E28               	movlw	40
+   105  000170  6EC6               	movwf	4038,c	;volatile
+   106                           ;AD5172_I2C.c: 39: SSPADD = 9;
+   107  000172  0E09               	movlw	9
+   108  000174  6EC8               	movwf	4040,c
+   109                           ;AD5172_I2C.c: 40: SSPSTAT = 0;
+   110  000176  6AC7               	clrf	4039,c	;volatile
+   111                           ;AD5172_I2C.c: 43: AD5172_Stop();
+   112                           ;AD5172_I2C.c: 44: }
+   113  000178                     _AD5172_Stop:
+   114  000000                     
+   115                           ;AD5172_I2C.c: 49: void
+   116  000178  969E               	bcf	3998,3,c	;volatile
+   117                           ;AD5172_I2C.c: 53: PEN = 1;
+   118  00017A  84C5               	bsf	4037,2,c	;volatile
+   119                           ;AD5172_I2C.c: 54: timeout=0;
+   120  00017C  0103               	movlb	_timeout shr (0+8)
+   121  00017E  6B62               	clrf	_timeout& (0+255),b
+   122                           ;AD5172_I2C.c: 55: while ((SSPIF == 0)&&(timeout
+      +                          <10));
+   123  000180                     l4:
+   124  000180  B69E               	btfsc	3998,3,c	;volatile
+   125  000182  D004               	goto	u30
+   126  000184  0E09               	movlw	9
+   127  000186  0103               	movlb	_timeout shr (0+8)
+   128  000188  6562               	cpfsgt	_timeout& (0+255),b
+   129  00018A  D7FA               	goto	l4
+   130  00018C                     u30:
+   131                           ;AD5172_I2C.c: 56: if (SSPIF == 0) errorFlag=0x8
+      +                          0;
+   132  00018C  B69E               	btfsc	3998,3,c	;volatile
+   133  00018E  0012               	return	
+   134  000190  0E80               	movlw	-128
+   135  000192  CFE8 F360          	movff	wreg,_errorFlag
+   136                           ;AD5172_I2C.c: 57: }
+   137  000196  0012               	return	
+   138  000198                     _AD5172_Start:
+   139  000000                     
+   140                           ;AD5172_I2C.c: 60: void
+   141  000198  969E               	bcf	3998,3,c	;volatile
+   142                           ;AD5172_I2C.c: 64: SEN = 1;
+   143  00019A  80C5               	bsf	4037,0,c
+   144                           ;AD5172_I2C.c: 65: timeout=0;
+   145  00019C  0103               	movlb	_timeout shr (0+8)
+   146  00019E  6B62               	clrf	_timeout& (0+255),b
+   147                           ;AD5172_I2C.c: 66: while ((SSPIF == 0)&&(timeout
+      +                          <10));
+   148  0001A0                     l9:
+   149  0001A0  B69E               	btfsc	3998,3,c	;volatile
+   150  0001A2  D004               	goto	u70
+   151  0001A4  0E09               	movlw	9
+   152  0001A6  0103               	movlb	_timeout shr (0+8)
+   153  0001A8  6562               	cpfsgt	_timeout& (0+255),b
+   154  0001AA  D7FA               	goto	l9
+   155  0001AC                     u70:
+   156                           ;AD5172_I2C.c: 67: if (SSPIF == 0) errorFlag=0x8
+      +                          0;
+   157  0001AC  B69E               	btfsc	3998,3,c	;volatile
+   158  0001AE  0012               	return	
+   159  0001B0  0E80               	movlw	-128
+   160  0001B2  CFE8 F360          	movff	wreg,_errorFlag
+   161                           ;AD5172_I2C.c: 68: }
+   162  0001B6  0012               	return	
+   163  0001B8                     _AD5172_Restart:
+   164  000000                     
+   165                           ;AD5172_I2C.c: 72: void
+   166  0001B8  969E               	bcf	3998,3,c	;volatile
+   167                           ;AD5172_I2C.c: 76: RSEN = 1;
+   168  0001BA  82C5               	bsf	4037,1,c	;volatile
+   169                           ;AD5172_I2C.c: 77: timeout=0;
+   170  0001BC  0103               	movlb	_timeout shr (0+8)
+   171  0001BE  6B62               	clrf	_timeout& (0+255),b
+   172                           ;AD5172_I2C.c: 78: while ((SSPIF == 0)&&(timeout
+      +                          <10));
+   173  0001C0                     l14:
+   174  0001C0  B69E               	btfsc	3998,3,c	;volatile
+   175  0001C2  D004               	goto	u110
+   176  0001C4  0E09               	movlw	9
+   177  0001C6  0103               	movlb	_timeout shr (0+8)
+   178  0001C8  6562               	cpfsgt	_timeout& (0+255),b
+   179  0001CA  D7FA               	goto	l14
+   180  0001CC                     u110:
+   181                           ;AD5172_I2C.c: 79: if (SSPIF == 0) errorFlag=0x8
+      +                          0;
+   182  0001CC  B69E               	btfsc	3998,3,c	;volatile
+   183  0001CE  0012               	return	
+   184  0001D0  0E80               	movlw	-128
+   185  0001D2  CFE8 F360          	movff	wreg,_errorFlag
+   186                           ;AD5172_I2C.c: 80: }
+   187  0001D6  0012               	return	
+   188  0001D8                     _AD5172_SendByte:
+   189  000000                     
+   190                           ;AD5172_I2C.c: 83: void AD5172_SendByte(unsigned
+      +                           char byte)
+   191  0001D8  969E               	bcf	3998,3,c	;volatile
+   192                           ;AD5172_I2C.c: 86: SSPBUF = byte;
+   193  0001DA  6EC9               	movwf	4041,c	;volatile
+   194                           ;AD5172_I2C.c: 87: timeout=0;
+   195  0001DC  0103               	movlb	_timeout shr (0+8)
+   196  0001DE  6B62               	clrf	_timeout& (0+255),b
+   197                           ;AD5172_I2C.c: 88: while ((SSPIF == 0)&&(timeout
+      +                          <10));
+   198  0001E0                     l19:
+   199  0001E0  B69E               	btfsc	3998,3,c	;volatile
+   200  0001E2  D004               	goto	u150
+   201  0001E4  0E09               	movlw	9
+   202  0001E6  0103               	movlb	_timeout shr (0+8)
+   203  0001E8  6562               	cpfsgt	_timeout& (0+255),b
+   204  0001EA  D7FA               	goto	l19
+   205  0001EC                     u150:
+   206                           ;AD5172_I2C.c: 89: if (SSPIF == 0) errorFlag=0x8
+      +                          0;
+   207  0001EC  B69E               	btfsc	3998,3,c	;volatile
+   208  0001EE  0012               	return	
+   209  0001F0  0E80               	movlw	-128
+   210  0001F2  CFE8 F360          	movff	wreg,_errorFlag
+   211                           ;AD5172_I2C.c: 90: }
+   212  0001F6  0012               	return	
+   213  0001F8                     _get_Acknowledge:
+   214  000000                     
+   215                           ;AD5172_I2C.c: 94: unsigned char get_Acknowledge
+      +                          (void)
+   216  0001F8  0E00               	movlw	0
+   217  0001FA  BCC5               	btfsc	4037,6,c	;volatile
+   218  0001FC  0E01               	movlw	1
+   219  0001FE  6ED9               	movwf	fsr2l,c
+   220                           ;AD5172_I2C.c: 99: return ack;
+   221  000200  50D9               	movf	fsr2l,w,c
+   222  000202  0012               	return	
+   223                           ;AD5172_I2C.c: 100: }
+   224  000204                     _send_Acknowledge:
+   225  000000                     
+   226                           ; _ack loaded to fsr2l
+   227  000204  6ED9               	movwf	fsr2l,c
+   228                           ;AD5172_I2C.c: 103: void send_Acknowledge(unsign
+      +                          ed char ack)
+   229  000206  969E               	bcf	3998,3,c	;volatile
+   230                           ;AD5172_I2C.c: 106: ACKDT=ack;
+   231  000208  CFD9 F000          	movff	fsr2l,btemp
+   232  00020C  3000               	rrcf	btemp,w,c
+   233  00020E  E302               	bnc	u170
+   234  000210  8AC5               	bsf	4037,5,c	;volatile
+   235  000212  D001               	goto	u185
+   236  000214                     u170:
+   237  000214  9AC5               	bcf	4037,5,c	;volatile
+   238  000216                     u185:
+   239                           ;AD5172_I2C.c: 107: ACKEN=1;
+   240  000216  88C5               	bsf	4037,4,c	;volatile
+   241                           ;AD5172_I2C.c: 108: timeout=0;
+   242  000218  0103               	movlb	_timeout shr (0+8)
+   243  00021A  6B62               	clrf	_timeout& (0+255),b
+   244                           ;AD5172_I2C.c: 109: while ((SSPIF == 0)&&(timeou
+      +                          t<10));
+   245  00021C                     l25:
+   246  00021C  B69E               	btfsc	3998,3,c	;volatile
+   247  00021E  D004               	goto	u210
+   248  000220  0E09               	movlw	9
+   249  000222  0103               	movlb	_timeout shr (0+8)
+   250  000224  6562               	cpfsgt	_timeout& (0+255),b
+   251  000226  D7FA               	goto	l25
+   252  000228                     u210:
+   253                           ;AD5172_I2C.c: 110: if (SSPIF == 0) errorFlag=0x
+      +                          80;
+   254  000228  B69E               	btfsc	3998,3,c	;volatile
+   255  00022A  0012               	return	
+   256  00022C  0E80               	movlw	-128
+   257  00022E  CFE8 F360          	movff	wreg,_errorFlag
+   258                           ;AD5172_I2C.c: 111: }
+   259  000232  0012               	return	
+   260  000234                     _AD5172_ReceiveByte:
+   261  000000                     
+   262                           ;AD5172_I2C.c: 114: int
+   263  000234  969E               	bcf	3998,3,c	;volatile
+   264                           ;AD5172_I2C.c: 120: RCEN = 1;
+   265  000236  86C5               	bsf	4037,3,c	;volatile
+   266                           ;AD5172_I2C.c: 121: timeout=0;
+   267  000238  0103               	movlb	_timeout shr (0+8)
+   268  00023A  6B62               	clrf	_timeout& (0+255),b
+   269                           ;AD5172_I2C.c: 122: while ((SSPIF == 0)&&(timeou
+      +                          t<10));
+   270  00023C                     l30:
+   271  00023C  B69E               	btfsc	3998,3,c	;volatile
+   272  00023E  D004               	goto	u250
+   273  000240  0E09               	movlw	9
+   274  000242  0103               	movlb	_timeout shr (0+8)
+   275  000244  6562               	cpfsgt	_timeout& (0+255),b
+   276  000246  D7FA               	goto	l30
+   277  000248                     u250:
+   278                           ;AD5172_I2C.c: 123: if (SSPIF == 0) errorFlag=0x
+      +                          80;
+   279  000248  B69E               	btfsc	3998,3,c	;volatile
+   280  00024A  D003               	goto	l33
+   281  00024C  0E80               	movlw	-128
+   282  00024E  CFE8 F360          	movff	wreg,_errorFlag
+   283  000252                     l33:
+   284                           ;AD5172_I2C.c: 124: byte = SSPBUF;
+   285  000252  50C9               	movf	4041,w,c	;volatile
+   286  000254  6ED9               	movwf	fsr2l,c
+   287                           ;AD5172_I2C.c: 125: return (int)byte;
+   288  000256  CFD9 F000          	movff	fsr2l,btemp
+   289  00025A  6A01               	clrf	btemp+1,c
+   290  00025C  0012               	return	
+   291                           ;AD5172_I2C.c: 126: }
+   292                           ;       param _dataByte assigned to ?_AD5172_Wri
+      +                          te+0
+   293  00025E  00B0               	dw	?_AD5172_Write
+   294  000260                     _AD5172_Write:
+   295  000000                     
+   296                           ; _potSelect loaded to fsr1l
+   297  000260  6EE1               	movwf	fsr1l,c
+   298                           ;AD5172_I2C.c: 129: void AD5172_Write(unsigned c
+      +                          har potSelect, unsigned char dataByte)
+   299  000262  6AD9               	clrf	fsr2l,c
+   300                           ;AD5172_I2C.c: 134: AD5172_Start();
+   301  000264  DF99               	call	_AD5172_Start	;wreg free
+   302                           ;AD5172_I2C.c: 135: AD5172_SendByte(0x00|0x5E);
+   303  000266  0E5E               	movlw	94
+   304  000268  DFB7               	call	_AD5172_SendByte
+   305                           ;AD5172_I2C.c: 136: errorFlag = errorFlag|get_Ac
+      +                          knowledge();
+   306  00026A  DFC6               	call	_get_Acknowledge	;wreg free
+   307  00026C  0103               	movlb	_errorFlag shr (0+8)
+   308  00026E  1360               	iorwf	_errorFlag& (0+255),f,b
+   309                           ;AD5172_I2C.c: 139: if(1==potSelect)
+   310  000270  04E1               	decf	fsr1l,w,c
+   311  000272  E102               	bnz	l35
+   312                           ;AD5172_I2C.c: 140: instructionByte=0x08;
+   313  000274  0E08               	movlw	8
+   314  000276  D001               	goto	L1
+   315  000278                     l35:
+   316                           ;AD5172_I2C.c: 141: else
+   317  000278  0E88               	movlw	136
+   318  00027A                     L1:
+   319  00027A  6ED9               	movwf	fsr2l,c
+   320                           ;AD5172_I2C.c: 144: AD5172_SendByte(instructionB
+      +                          yte);
+   321  00027C  50D9               	movf	fsr2l,w,c
+   322  00027E  DFAC               	call	_AD5172_SendByte
+   323                           ;AD5172_I2C.c: 145: errorFlag = errorFlag|get_Ac
+      +                          knowledge();
+   324  000280  DFBB               	call	_get_Acknowledge	;wreg free
+   325  000282  0103               	movlb	_errorFlag shr (0+8)
+   326  000284  1360               	iorwf	_errorFlag& (0+255),f,b
+   327                           ;AD5172_I2C.c: 148: AD5172_SendByte(dataByte);
+   328  000286  0100               	movlb	__Lparam shr (0+8)
+   329  000288  51B0               	movf	?_AD5172_Write^(__Lparam& (0+65280)),w
+   330  00028A  DFA6               	call	_AD5172_SendByte
+   331                           ;AD5172_I2C.c: 149: errorFlag = errorFlag|get_Ac
+      +                          knowledge();
+   332  00028C  DFB5               	call	_get_Acknowledge	;wreg free
+   333  00028E  D023               	goto	L5
+   334                           ;AD5172_I2C.c: 152: AD5172_Stop();
+   335                           ;AD5172_I2C.c: 153: }
+   336  000290                     _AD5172_Set:
+   337  000000                     
+   338                           ; _potSelect loaded to fsr1l
+   339  000290  6EE1               	movwf	fsr1l,c
+   340                           ;AD5172_I2C.c: 157: void AD5172_Set(unsigned cha
+      +                          r potSelect)
+   341  000292  6AD9               	clrf	fsr2l,c
+   342                           ;AD5172_I2C.c: 162: AD5172_Start();
+   343  000294  DF81               	call	_AD5172_Start	;wreg free
+   344                           ;AD5172_I2C.c: 163: AD5172_SendByte(0x00|0x5E);
+   345  000296  0E5E               	movlw	94
+   346  000298  DF9F               	call	_AD5172_SendByte
+   347                           ;AD5172_I2C.c: 164: errorFlag = errorFlag|get_Ac
+      +                          knowledge();
+   348  00029A  DFAE               	call	_get_Acknowledge	;wreg free
+   349  00029C  0103               	movlb	_errorFlag shr (0+8)
+   350  00029E  1360               	iorwf	_errorFlag& (0+255),f,b
+   351                           ;AD5172_I2C.c: 167: if(1==potSelect)
+   352  0002A0  04E1               	decf	fsr1l,w,c
+   353  0002A2  E102               	bnz	l38
+   354                           ;AD5172_I2C.c: 168: instructionByte=0x00;
+   355  0002A4  6AD9               	clrf	fsr2l,c
+   356  0002A6  D002               	goto	l39
+   357  0002A8                     l38:
+   358                           ;AD5172_I2C.c: 169: else
+   359  0002A8  0E80               	movlw	128
+   360  0002AA  6ED9               	movwf	fsr2l,c
+   361  0002AC                     l39:
+   362                           ;AD5172_I2C.c: 172: AD5172_SendByte(instructionB
+      +                          yte);
+   363  0002AC  50D9               	movf	fsr2l,w,c
+   364  0002AE  DF94               	call	_AD5172_SendByte
+   365                           ;AD5172_I2C.c: 173: errorFlag = errorFlag|get_Ac
+      +                          knowledge();
+   366  0002B0  DFA3               	call	_get_Acknowledge	;wreg free
+   367  0002B2  D011               	goto	L5
+   368                           ;AD5172_I2C.c: 176: AD5172_Stop();
+   369                           ;AD5172_I2C.c: 177: }
+   370  0002B4                     _AD5172_Program:
+   371  000000                     
+   372                           ; _potSelect loaded to fsr1l
+   373  0002B4  6EE1               	movwf	fsr1l,c
+   374                           ;AD5172_I2C.c: 180: void AD5172_Program(unsigned
+      +                           char potSelect)
+   375  0002B6  6AD9               	clrf	fsr2l,c
+   376                           ;AD5172_I2C.c: 185: AD5172_Start();
+   377  0002B8  DF6F               	call	_AD5172_Start	;wreg free
+   378                           ;AD5172_I2C.c: 186: AD5172_SendByte(0x00|0x5E);
+   379  0002BA  0E5E               	movlw	94
+   380  0002BC  DF8D               	call	_AD5172_SendByte
+   381                           ;AD5172_I2C.c: 187: errorFlag = errorFlag|get_Ac
+      +                          knowledge();
+   382  0002BE  DF9C               	call	_get_Acknowledge	;wreg free
+   383  0002C0  0103               	movlb	_errorFlag shr (0+8)
+   384  0002C2  1360               	iorwf	_errorFlag& (0+255),f,b
+   385                           ;AD5172_I2C.c: 189: if(1==potSelect)instructionB
+      +                          yte=0x28;
+   386  0002C4  04E1               	decf	fsr1l,w,c
+   387  0002C6  E102               	bnz	l41
+   388  0002C8  0E28               	movlw	40
+   389  0002CA  D001               	goto	L2
+   390  0002CC                     l41:
+   391                           ;AD5172_I2C.c: 190: else instructionByte=0xA8;
+   392  0002CC  0EA8               	movlw	168
+   393  0002CE                     L2:
+   394  0002CE  6ED9               	movwf	fsr2l,c
+   395                           ;AD5172_I2C.c: 192: AD5172_SendByte(instructionB
+      +                          yte);
+   396  0002D0  50D9               	movf	fsr2l,w,c
+   397  0002D2  DF82               	call	_AD5172_SendByte
+   398                           ;AD5172_I2C.c: 193: errorFlag = errorFlag|get_Ac
+      +                          knowledge();
+   399  0002D4  DF91               	call	_get_Acknowledge	;wreg free
+   400  0002D6                     L5:
+   401  0002D6  0103               	movlb	_errorFlag shr (0+8)
+   402  0002D8  1360               	iorwf	_errorFlag& (0+255),f,b
+   403                           ;AD5172_I2C.c: 196: AD5172_Stop();
+   404  0002DA  D74E               	goto	_AD5172_Stop	;wreg free
+   405                           ;AD5172_I2C.c: 197: }
+   406  0002DC                     _AD5172_Read:
+   407  000000                     
+   408                           ;AD5172_I2C.c: 200: int AD5172_Read(void)
+   409  0002DC  DF5D               	call	_AD5172_Start	;wreg free
+   410                           ;AD5172_I2C.c: 208: AD5172_SendByte(0x5E|0x01);
+   411  0002DE  0E5F               	movlw	95
+   412  0002E0  DF7B               	call	_AD5172_SendByte
+   413                           ;AD5172_I2C.c: 209: errorFlag = errorFlag | get_
+      +                          Acknowledge();
+   414  0002E2  DF8A               	call	_get_Acknowledge	;wreg free
+   415  0002E4  0103               	movlb	_errorFlag shr (0+8)
+   416  0002E6  1360               	iorwf	_errorFlag& (0+255),f,b
+   417                           ;AD5172_I2C.c: 215: dataByte = AD5172_ReceiveByt
+      +                          e();
+   418  0002E8  DFA5               	call	_AD5172_ReceiveByte	;wreg free
+   419  0002EA  C000  FFF6         	movff	btemp,tblptrl
+   420  0002EE  C001  FFF7         	movff	btemp+1,tblptrh
+   421                           ;AD5172_I2C.c: 216: send_Acknowledge(0);
+   422  0002F2  0E00               	movlw	0
+   423  0002F4  DF87               	call	_send_Acknowledge
+   424                           ;AD5172_I2C.c: 219: temp = AD5172_ReceiveByte();
+   425  0002F6  DF9E               	call	_AD5172_ReceiveByte	;wreg free
+   426  0002F8  C000  FFF3         	movff	btemp,prodl
+   427  0002FC  C001  FFF4         	movff	btemp+1,prodh
+   428                           ;AD5172_I2C.c: 220: status = temp & 0xC0;
+   429  000300  50F3               	movf	prodl,w,c
+   430  000302  0BC0               	andlw	-64
+   431  000304  6ED9               	movwf	fsr2l,c
+   432                           ;AD5172_I2C.c: 221: if(0x00==status)OTP_Validati
+      +                          on_Flag=0;
+   433  000306  50D9               	movf	fsr2l,w,c
+   434  000308  E103               	bnz	l44
+   435  00030A  0103               	movlb	_OTP_Validation_Flag shr (0+8)
+   436  00030C  6B5C               	clrf	_OTP_Validation_Flag& (0+255),b
+   437  00030E  D008               	goto	l45
+   438  000310                     l44:
+   439                           ;AD5172_I2C.c: 222: else if(0xC0==status)OTP_Val
+      +                          idation_Flag=1;
+   440  000310  50D9               	movf	fsr2l,w,c
+   441  000312  0AC0               	xorlw	-64
+   442  000314  E102               	bnz	l46
+   443  000316  0E01               	movlw	1
+   444  000318  D001               	goto	L3
+   445  00031A                     l46:
+   446                           ;AD5172_I2C.c: 223: else OTP_Validation_Flag=2;
+   447  00031A  0E02               	movlw	2
+   448  00031C                     L3:
+   449  00031C  CFE8 F35C          	movff	wreg,_OTP_Validation_Flag
+   450  000320                     l45:
+   451                           ;AD5172_I2C.c: 224: send_Acknowledge(1);
+   452  000320  0E01               	movlw	1
+   453  000322  DF70               	call	_send_Acknowledge
+   454                           ;AD5172_I2C.c: 225: AD5172_Stop();
+   455  000324  DF29               	call	_AD5172_Stop	;wreg free
+   456                           ;AD5172_I2C.c: 226: return((int)dataByte);
+   457  000326  CFF6 F000          	movff	tblptrl,btemp
+   458  00032A  CFF7 F001          	movff	tblptrh,btemp+1
+   459  00032E  0012               	return	
+   460                           ;AD5172_I2C.c: 227: }
+   461  000330  00B0               	dw	?_i2c_SlaveWrite
+   462  000332                     _i2c_SlaveWrite:
+   463  000000                     
+   464                           ; _device loaded to fsr2l
+   465  000332  6ED9               	movwf	fsr2l,c
+   466                           ;AD5172_I2C.c: 232: void i2c_SlaveWrite(unsigned
+      +                           char device, unsigned char numDataBytes) {
+   467  000334  0103               	movlb	_errorFlag shr (0+8)
+   468  000336  6B60               	clrf	_errorFlag& (0+255),b
+   469                           ;AD5172_I2C.c: 238: AD5172_Start();
+   470  000338  DF2F               	call	_AD5172_Start	;wreg free
+   471                           ;AD5172_I2C.c: 240: AD5172_SendByte(device|0x00)
+      +                          ;
+   472  00033A  50D9               	movf	fsr2l,w,c
+   473  00033C  DF4D               	call	_AD5172_SendByte
+   474                           ;AD5172_I2C.c: 241: errorFlag = errorFlag | get_
+      +                          Acknowledge();
+   475  00033E  DF5C               	call	_get_Acknowledge	;wreg free
+   476  000340  0103               	movlb	_errorFlag shr (0+8)
+   477  000342  1360               	iorwf	_errorFlag& (0+255),f,b
+   478                           ;AD5172_I2C.c: 244: for(i=0; i<numDataBytes; i++
+      +                          )
+   479  000344  6AE1               	clrf	fsr1l,c
+   480  000346                     l52:
+   481  000346  0100               	movlb	__Lparam shr (0+8)
+   482  000348  51B0               	movf	?_i2c_SlaveWrite^(__Lparam& (0+65280)),w
+   483  00034A  5CE1               	subwf	fsr1l,w,c
+   484  00034C  E213               	bc	u320
+   485                           ;AD5172_I2C.c: 245: {
+   486  00034E  50E1               	movf	fsr1l,w,c
+   487  000350  EE03  F01A         	lfsr	0,_outBuffer
+   488  000354  26E9               	addwf	fsr0l,f,c
+   489  000356  0E00               	movlw	0
+   490  000358  22EA               	addwfc	fsr0h,f,c
+   491  00035A  50EF               	movf	indf0,w,c
+   492  00035C  6ED9               	movwf	fsr2l,c
+   493                           ;AD5172_I2C.c: 247: AD5172_SendByte(dataByte);
+   494  00035E  50D9               	movf	fsr2l,w,c
+   495  000360  DF3B               	call	_AD5172_SendByte
+   496                           ;AD5172_I2C.c: 248: errorFlag = errorFlag | get_
+      +                          Acknowledge();
+   497  000362  DF4A               	call	_get_Acknowledge	;wreg free
+   498  000364  0103               	movlb	_errorFlag shr (0+8)
+   499  000366  1360               	iorwf	_errorFlag& (0+255),f,b
+   500                           ;AD5172_I2C.c: 250: WCOLflag=WCOL;
+   501  000368  0E00               	movlw	0
+   502  00036A  BEC6               	btfsc	4038,7,c	;volatile
+   503  00036C  0E01               	movlw	1
+   504  00036E  6ED9               	movwf	fsr2l,c
+   505  000370  2AE1               	incf	fsr1l,f,c
+   506  000372  D7E9               	goto	l52
+   507  000374                     u320:
+   508                           ;AD5172_I2C.c: 251: }
+   509  000374  D701               	goto	_AD5172_Stop	;wreg free
+   510                           ;AD5172_I2C.c: 255: }
+   511  000376  00B0               	dw	?_i2c_SlaveRead
+   512  000378                     _i2c_SlaveRead:
+   513  000000                     
+   514                           ; _device loaded to fsr1l
+   515  000378  6EE1               	movwf	fsr1l,c
+   516                           ;AD5172_I2C.c: 258: void i2c_SlaveRead(unsigned 
+      +                          char device, unsigned char numBytes) {
+   517  00037A  0103               	movlb	_errorFlag shr (0+8)
+   518  00037C  6B60               	clrf	_errorFlag& (0+255),b
+   519                           ;AD5172_I2C.c: 264: AD5172_Start();
+   520  00037E  DF0C               	call	_AD5172_Start	;wreg free
+   521                           ;AD5172_I2C.c: 265: AD5172_SendByte(device|0x01)
+      +                          ;
+   522  000380  50E1               	movf	fsr1l,w,c
+   523  000382  0901               	iorlw	1
+   524  000384  DF29               	call	_AD5172_SendByte
+   525                           ;AD5172_I2C.c: 266: errorFlag = errorFlag | get_
+      +                          Acknowledge();
+   526  000386  DF38               	call	_get_Acknowledge	;wreg free
+   527  000388  0103               	movlb	_errorFlag shr (0+8)
+   528  00038A  1360               	iorwf	_errorFlag& (0+255),f,b
+   529                           ;AD5172_I2C.c: 268: i = 0;
+   530  00038C  6AE1               	clrf	fsr1l,c
+   531  00038E                     l56:
+   532                           ;AD5172_I2C.c: 269: do {
+   533                           ;AD5172_I2C.c: 271: inBuffer[i] = AD5172_Receive
+      +                          Byte();
+   534  00038E  DF52               	call	_AD5172_ReceiveByte	;wreg free
+   535  000390  50E1               	movf	fsr1l,w,c
+   536  000392  EE23  F0A4         	lfsr	2,_inBuffer
+   537  000396  26D9               	addwf	fsr2l,f,c
+   538  000398  0E00               	movlw	0
+   539  00039A  22DA               	addwfc	fsr2h,f,c
+   540  00039C  C000  FFDF         	movff	btemp,indf2
+   541                           ;AD5172_I2C.c: 272: i++;
+   542  0003A0  2AE1               	incf	fsr1l,f,c
+   543                           ;AD5172_I2C.c: 274: if (i < numBytes)
+   544  0003A2  0100               	movlb	__Lparam shr (0+8)
+   545  0003A4  51B0               	movf	?_i2c_SlaveRead^(__Lparam& (0+65280)),w
+   546  0003A6  60E1               	cpfslt	fsr1l,c
+   547  0003A8  D003               	goto	l57
+   548                           ;AD5172_I2C.c: 275: send_Acknowledge(0);
+   549  0003AA  0E00               	movlw	0
+   550  0003AC  DF2B               	call	_send_Acknowledge
+   551  0003AE  D002               	goto	l58
+   552  0003B0                     l57:
+   553                           ;AD5172_I2C.c: 276: else
+   554  0003B0  0E01               	movlw	1
+   555  0003B2  DF28               	call	_send_Acknowledge
+   556  0003B4                     l58:
+   557                           ;AD5172_I2C.c: 278: } while (i < numBytes);
+   558  0003B4  0100               	movlb	__Lparam shr (0+8)
+   559  0003B6  51B0               	movf	?_i2c_SlaveRead^(__Lparam& (0+65280)),w
+   560  0003B8  5CE1               	subwf	fsr1l,w,c
+   561  0003BA  E3E9               	bnc	l56
+   562                           ;AD5172_I2C.c: 279: AD5172_Stop();
+   563  0003BC  D6DD               	goto	_AD5172_Stop	;wreg free
+   564                           
+   565                           	psect	temp
+   566  000000                     btemp:
+   567  000000                     	ds	2
+   568                           tblptrh	equ	0xFF7
+   569                           tblptrl	equ	0xFF6
+   570                           prodh	equ	0xFF4
+   571                           prodl	equ	0xFF3
+   572                           indf0	equ	0xFEF
+   573                           fsr0h	equ	0xFEA
+   574                           fsr0l	equ	0xFE9
+   575                           wreg	equ	0xFE8
+   576                           fsr1l	equ	0xFE1
+   577                           indf2	equ	0xFDF
+   578                           fsr2h	equ	0xFDA
+   579                           fsr2l	equ	0xFD9
+
+
+HI-TECH Software PICC-18 Macro Assembler V9.50PL2
+Symbol Table                                           Mon Sep 29 14:45:38 2008
+
+                          l4 0180                            l9 01A0  
+                         l30 023C                           l14 01C0  
+                         l41 02CC                           l33 0252  
+                         l25 021C                           l35 0278  
+                         l19 01E0                           l52 0346  
+                         l44 0310                           l45 0320  
+                         l46 031A                           l38 02A8  
+                         l39 02AC                           l56 038E  
+                         l57 03B0                           l58 03B4  
+                         u30 018C                           u70 01AC  
+                        u110 01CC                          u210 0228  
+                        u150 01EC                          u320 0374  
+                        u250 0248                          u170 0214  
+                        u185 0216                          wreg 000FE8  
+                 _AD5172_Set 0290                     _inBuffer 03A4  
+        _OTP_Validation_Flag 035C                         fsr0h 000FEA  
+                       indf0 000FEF                         fsr0l 000FE9  
+                       fsr2h 000FDA                         fsr1l 000FE1  
+                       indf2 000FDF                         fsr2l 000FD9  
+                       btemp 0000                         prodl 000FF3  
+                _AD5172_Read 02DC                  _AD5172_Stop 0178  
+              _i2c_SlaveRead 0378                   used_btemp0 0001  
+                 used_btemp1 0001              _get_Acknowledge 01F8  
+                  _errorFlag 0360                        status 000FD8  
+               _AD5172_Start 0198                 _AD5172_Write 0260  
+                    __Lparam 0097                    _outBuffer 031A  
+                    __ramtop 0400               _i2c_SlaveWrite 0332  
+            ?_i2c_SlaveWrite 00B0                      _timeout 0362  
+             _initialize_I2C 016E                ?_AD5172_Write 00B0  
+             ?_i2c_SlaveRead 00B0              _AD5172_SendByte 01D8  
+                     tblptrl 000FF6           _AD5172_ReceiveByte 0234  
+           _send_Acknowledge 0204               _AD5172_Restart 01B8  
+             _AD5172_Program 02B4  

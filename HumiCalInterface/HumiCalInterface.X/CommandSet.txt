@@ -1,0 +1,31 @@
+
+SETRA HUMIDITY CAL SYSTEM COMMAND SET AS OF Jan. 3, 2008:
+
+To write a value of 123 to pot 1:
+"#1 P1 W 123 [ENTER]"
+
+To write a value of 123 to pot 2:
+"#1 P2 W 123 [ENTER]"
+
+To Write a value of 122 to same pot:
+"122 [ENTER]"
+
+
+To program sensor tips:
+
+1) Switch to OTP mode to turn on programming supply:
+"OTP [ENTER]"
+
+2) Program pot 1 for all sensor tips using WRITE command as shown above.
+IMPORTANT NOTE: DO NOT USE PROGRAM COMMAND UNTIL ONE OF THE POTS ON EACH 
+SENSOR TIP IS SET.
+
+2) Program pot 2 for all sensor tips using PROGRAM command:
+"#1 P2 PROG 123 [ENTER]"
+
+
+To switch back to NORMAL mode:
+"NORM [ENTER]"
+
+
+
